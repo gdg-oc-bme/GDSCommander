@@ -1,7 +1,8 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from config import TOKEN
+import os
+from dotenv import load_dotenv
 
 
 intents = discord.Intents.default()
@@ -32,5 +33,15 @@ async def on_message(message):
 async def test(interaction: discord.Interaction):
     await interaction.response.send_message(f"Hey {interaction.user.mention}! This is a slash command!")
 
-bot.run(TOKEN)
-client.run(TOKEN)
+def main():
+    # In case it is a production environment, the .env file should be ignored
+    # Variables in production should be stored somewhere else (e.g. GitHub secrets)
+    if os.getenv("ENV")!="PROD":
+        load_dotenv()
+        
+    TOKEN=os.getenv("TOKEN")
+    bot.run(TOKEN)
+    client.run(TOKEN)
+
+if __name__=="__main__":
+    main()
