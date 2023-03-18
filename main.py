@@ -8,25 +8,19 @@ from dotenv import load_dotenv
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix='$', intents=intents)
 
-@client.event
+@bot.event
 async def on_ready():
-    print(f'Logged on as {client.user}!')
-    try:
-        synced = await bot.tree.sync()
-        print(f'Synced {len(synced)} command(s)')
-    except Exception as e:
-        print(e)
+    print(f'Logged on as {bot.user}!')
 
-@client.event
+@bot.event
 async def on_message(message):
     print(f'Message from {message.author}: {message.content}')
-    if message.author == client.user:
+    if message.author == bot.user:
         return
     
-    if client.user.mentioned_in(message):
+    if bot.user.mentioned_in(message):
         await message.channel.send('You pinged me! I\'m still a work in progress!')
 
 @bot.tree.command()
@@ -41,7 +35,6 @@ def main():
         
     TOKEN=os.getenv("TOKEN")
     bot.run(TOKEN)
-    client.run(TOKEN)
 
 if __name__=="__main__":
     main()
