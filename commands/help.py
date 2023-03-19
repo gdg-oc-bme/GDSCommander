@@ -9,7 +9,14 @@ async def help(interaction: Interaction):
         description='These are the slash commands you will need while using this bot:',
         color=Color.blue()
     )
-    response.set_footer(text="Hope it helped :)")
-    response.add_field(name='/help', value='Shows you the available commands', inline=False)
     response.set_thumbnail(url='https://i.imgur.com/kLnSlU2.png')
+    response.set_footer(text="Hope it helped :)")
+    
+    response.add_field(name='/help', value='Shows you the available commands', inline=False)
+    response.add_field(name='/howto-join-member', value='Tells you how to join as a member', inline=False)
+    response.add_field(name='/howto-join-core', value='Tells you how to join as a core member', inline=False)
+    response.add_field(name='/event-team', value='Tells you about the event team responsibilities', inline=False)
+    response.add_field(name='/solutions-team', value='Tells you about the solutions team responsibilities', inline=False)
+    response.add_field(name='/tech-team', value='Tells you about the tech team responsibilities', inline=False)
+    response.add_field(name='/social-media-team', value='Tells you about the social media team responsibilities', inline=False)
     await interaction.response.send_message(embed=response)
