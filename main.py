@@ -9,7 +9,7 @@ def main():
         load_dotenv()
     from setup import bot
 
-    from commands import help, teams
+    from commands import help, teams, howto
     import events
     TOKEN=getenv("TOKEN")
     bot.run(TOKEN)
