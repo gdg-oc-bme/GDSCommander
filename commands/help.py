@@ -7,12 +7,13 @@ async def help(interaction: Interaction):
     response = Embed(
         title="GDSCommander Help",
         description='These are the slash commands you will need while using this bot:',
-        color=Color.blue()
+        color=Color.light_embed()
     )
     response.set_thumbnail(url='https://i.imgur.com/kLnSlU2.png')
     response.set_footer(text="Hope it helped :)")
     
     response.add_field(name='/help', value='Shows you the available commands', inline=False)
+    response.add_field(name='/about', value='Shows you a short introduction about the club', inline=False)
     response.add_field(name='/howto-join-member', value='Tells you how to join as a member', inline=False)
     response.add_field(name='/howto-join-core', value='Tells you how to join as a core member', inline=False)
     response.add_field(name='/event-team', value='Tells you about the event team responsibilities', inline=False)

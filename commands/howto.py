@@ -9,7 +9,7 @@ async def member(interaction: Interaction):
         description='''If you are reading this, then congrats! You are a member already!
         If you are asking for a friend, here are the steps:
         ''',
-        color=Color.dark_grey()
+        color=Color.light_embed()
     )
     response.add_field(
         name='Step 1', 
@@ -29,7 +29,7 @@ async def core(interaction: Interaction):
         title="How to be a core member",
         description='''Being a core member comes with a set of responsibilities, so you will need to go through an interview process.
         ''',
-        color=Color.darker_grey()
+        color=Color.light_embed()
     )
     response.add_field(
         name='When to apply', 
