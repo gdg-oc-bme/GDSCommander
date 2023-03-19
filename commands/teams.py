@@ -1,4 +1,5 @@
 '''Implementation of commands related to the different teams'''
+from os import getenv
 from discord import Interaction, Embed, Color
 from setup import bot
 
@@ -11,7 +12,7 @@ async def event_team(interaction: Interaction):
         ''',
         color=Color.blue()
     )
-    response.set_author(name='About the Event Team', icon_url='https://i.imgur.com/8mhlomF.png')
+    response.set_author(name='About the Event Team', icon_url=getenv('EVENT_LOGO'))
     response.add_field(
         name='Meetings', 
         value='''This includes setting a time that matches everyone's schedule and choosing the place of the meeting''', 
@@ -35,7 +36,7 @@ async def solutions_team(interaction: Interaction):
         ''',
         color=Color.green()
     )
-    response.set_author(name='About the Solutions Team', icon_url='https://i.imgur.com/tynviZ5.png')
+    response.set_author(name='About the Solutions Team', icon_url=getenv('SOLUTIONS_LOGO'))
     response.add_field(
         name='Sprakers and Sponsors', 
         value='''Members of the solutions team are resourceful and easy-going. They are comfotable talking to strangers and inviting them to help the club during events''', 
@@ -59,7 +60,7 @@ async def tech_team(interaction: Interaction):
         ''',
         color=Color.yellow()
     )
-    response.set_author(name='About the Tech Team', icon_url='https://i.imgur.com/iUIyZIz.png')
+    response.set_author(name='About the Tech Team', icon_url=getenv('TECH_LOGO'))
     response.add_field(
         name='Research', 
         value='''Tech team members are curious and smart. They should be able to research new interesting technologies and suggest fun event ideas to the rest of the club''', 
@@ -83,7 +84,7 @@ async def social_media_team(interaction: Interaction):
         ''',
         color=Color.red()
     )
-    response.set_author(name='About the Social Media Team', icon_url='https://i.imgur.com/TMJTWeZ.png')
+    response.set_author(name='About the Social Media Team', icon_url=getenv('SM_LOGO'))
     response.add_field(
         name='Promotion', 
         value='''Social media team members are modern and creative. They should be able to use social media platforms easily and should be available enough for communicating with external members''', 
