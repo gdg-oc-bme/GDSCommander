@@ -14,8 +14,7 @@ async def help(interaction: Interaction):
     
     response.add_field(name='`/help`', value='Shows you the available commands', inline=False)
     response.add_field(name='`/about`', value='Shows you a short introduction about the club', inline=False)
-    response.add_field(name='`/howto-join-member`', value='Tells you how to join as a member', inline=False)
-    response.add_field(name='`/howto-join-core`', value='Tells you how to join as a core member', inline=False)
+    response.add_field(name='`/join`', value='You can use this with core or member as an argument to see how to join as those', inline=False)
     response.add_field(name='`/event-team`', value='Tells you about the event team responsibilities', inline=False)
     response.add_field(name='`/solutions-team`', value='Tells you about the solutions team responsibilities', inline=False)
     response.add_field(name='`/tech-team`', value='Tells you about the tech team responsibilities', inline=False)
