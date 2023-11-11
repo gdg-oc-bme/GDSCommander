@@ -11,6 +11,7 @@ def main():
 
     from commands import help, teams, join, about, socials
     import events
+    from events import welcomemessage 
     TOKEN=getenv("TOKEN")
     bot.run(TOKEN)
 
