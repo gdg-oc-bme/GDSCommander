@@ -38,8 +38,8 @@ async def solutions_team(interaction: Interaction):
     )
     response.set_author(name='About the Solutions Team', icon_url=getenv('SOLUTIONS_LOGO'))
     response.add_field(
-        name='Sprakers and Sponsors', 
-        value='''Members of the solutions team are resourceful and easy-going. They are comfotable talking to strangers and inviting them to help the club during events''', 
+        name='Speakers and Sponsors', 
+        value='''Members of the solutions team are resourceful and easy-going. They are comfortable talking to strangers and inviting them to help the club during events''', 
         inline=False)
     response.add_field(
         name='Recruitment', 
@@ -47,7 +47,7 @@ async def solutions_team(interaction: Interaction):
         inline=False)
     response.add_field(
         name='Problem Solving', 
-        value='''In case the club is having internal problems, the solutions team is there to solve them. I am one of those solutions beep! :D''', 
+        value='''In case the club is having internal problems, the solutions team is there to solve them. I am one of those solutions, beep! :D''', 
         inline=False)
     await interaction.response.send_message(embed=response)
 
