@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 from discord import Interaction, Embed, Color
 from setup import bot
-
+# Bot channel ID: 892913537612124181
+# Welcome channel ID: 881623399733014550
 @bot.event
 async def on_member_join(member):
     print(f"Recognized that {member.name} joined")
