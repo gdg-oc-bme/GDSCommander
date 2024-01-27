@@ -17,6 +17,9 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
+    if message.mention_everyone:
+        return
+    
     if bot.user.mentioned_in(message):
         await message.channel.send('You pinged me! I\'m still a work in progress!')
     
