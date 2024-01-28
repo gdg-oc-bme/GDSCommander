@@ -24,11 +24,3 @@ Lastly, don't forget to introduce yourself in the #self-introductions channel! ð
         print(f"Sent a welcome message to {member.name} privately.")
     except Exception as e:
         print(f"Couldn't message {member.name}: {e}")
-
-@bot.event
-async def on_member_remove(member):
-    print(f"Recognized that {member.name} left")
-    channel = member.guild.get_channel(881623399733014550)
-    if channel:
-        farewell_message = f"Goodbye {member.name} ðŸ˜”! It was great having you. See you again soon!"
-        await channel.send(farewell_message)
