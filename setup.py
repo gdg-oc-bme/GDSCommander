@@ -11,7 +11,7 @@ def main():
 
     from commands import help, teams, join, about, socials, createRole
     import events
-    from events import welcomemessage 
+    from events import welcomemessage, nameChange
     TOKEN=getenv("TOKEN")
     bot.run(TOKEN)
 
