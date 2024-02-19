@@ -62,3 +62,28 @@ async def on_reaction_add(reaction, user):
             print(f"Reaction {reaction.emoji} is not tracked for any role")  # Debugging line
     else:
         print(f"Message ID {reaction.message.id} is not tracked for reactions")  # Debugging line
+
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    print(f"Reaction {reaction.emoji} removed by {user}")  # Debugging line
+    # Check if the message is one that we've tracked for role reactions
+    if reaction.message.id in created_messages:
+        # Get the role ID associated with the removed reaction (if any)
+        role_id = created_messages[reaction.message.id].get(str(reaction.emoji))
+        if role_id:
+            guild = reaction.message.guild
+            role = discord.utils.get(guild.roles, id=int(role_id))
+            if role:
+                member = guild.get_member(user.id)
+                if member:
+                    await member.remove_roles(role)
+                    print(f"Removed role {role.name} from {member.display_name}")  # Debugging line
+                else:
+                    print(f"Member {user} not found in guild")  # Debugging line
+            else:
+                print(f"Role ID {role_id} not found in guild")  # Debugging line
+        else:
+            print(f"Reaction {reaction.emoji} is not tracked for any role")  # Debugging line
+    else:
+        print(f"Message ID {reaction.message.id} is not tracked for reactions")  # Debugging line
