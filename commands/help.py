@@ -24,4 +24,5 @@ async def help(interaction: Interaction):
     response.add_field(name='`/linkedin`', value='Gives you the link to our linkedin account', inline=False)
     response.add_field(name='`/website`', value='Gives you the link to our website', inline=False)
     response.add_field(name='`/linktree`', value='Gives you the link to our linktree', inline=False)
+    response.add_field(name='`/techtrivia`', value='Asks you a random tech-related trivia question and gives you four possible answers.', inline=False)
     await interaction.response.send_message(embed=response)
