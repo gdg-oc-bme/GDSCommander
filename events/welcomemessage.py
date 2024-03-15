@@ -16,9 +16,10 @@ You can use /help for a list of available commands.'''
     new_user_message = '''Welcome to GDSC BME!
 Google Developer Student Club BME is a club where techy people get to meet each other and learn new technologies. 
 We intend to bridge the gap between theory and practice and provide a welcoming community to like-minded people.
-If you have any questions, don't hesitate to ask any core-team member.
+If you have any questions, don't hesitate to ask any core team member.
 Make sure to go through the rules & description of every channel before posting.
-Lastly, don't forget to introduce yourself in the #self-introductions channel! 😊'''
+You can assign yourself roles based on your major and passion in the #choose-roles channel to find and connect with others.
+Lastly, don't forget to introduce yourself in the #self-introductions channel! You can also share your socials in the #share-socials channel. 😊'''
     try:
         await member.send(new_user_message)
         print(f"Sent a welcome message to {member.name} privately.")
