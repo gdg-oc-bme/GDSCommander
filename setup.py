@@ -9,7 +9,7 @@ def main():
         load_dotenv()
     from setup import bot
 
-    from commands import help, teams, join, about, socials, createRole, techTrivia
+    from commands import help, teams, join, about, socials, createRole, techTrivia, event
     import events
     from events import welcomemessage, nameChange
     TOKEN=getenv("TOKEN")
