@@ -2,24 +2,23 @@
 
 A discord bot that assists members in GDSC related inquiries and can give relevant information.
 
-## Deployment
 
-Run locally (requires [uv](https://docs.astral.sh/uv/), Python 3.10 or 3.11):
+## Run with Docker
 
 ```bash
-uv sync
-uv run python setup.py
+docker build -t gdscommander .
+docker run --env-file .env gdscommander
 ```
 
 *Note: Running the GDSCommander bot happens on DigitalOcean, to see your changes on the bot, please open a pull request.*
 
-## Dependencies (uv)
+## Local development (uv)
 
 Dependencies are declared in `pyproject.toml` and locked in `uv.lock`. Install and run in the project venv:
 
 ```sh
-uv sync   # create .venv and install from lock
-uv run python setup.py  # run bot (uses .venv)
+uv sync
+uv run python setup.py
 ```
 
 Add a dependency: edit `pyproject.toml` under `[project].dependencies`, then run `uv lock` and `uv sync`. Commit both `pyproject.toml` and `uv.lock`.
