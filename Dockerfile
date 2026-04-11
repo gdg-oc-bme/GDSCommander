@@ -16,6 +16,7 @@ RUN uv sync --locked
 
 # Runtime: no .env loaded; pass TOKEN (and optional logos) via env
 ENV ENV=PROD
+ENV PYTHONUNBUFFERED=1
 
 RUN adduser --disabled-password --gecos "" app && chown -R app:app /app
 USER app
