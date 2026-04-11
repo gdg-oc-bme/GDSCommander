@@ -29,8 +29,17 @@ def main():
     from events import welcomemessage, nameChange
     
     logger.info("Initializing Database...")
-    from database import init_db
+    from database import init_db, list_user_mappings
     init_db()
+    
+    # Database Validation Print
+    mappings = list_user_mappings()
+    if not mappings:
+        logger.info("Database validation: No user mappings found yet.")
+    else:
+        logger.info(f"Database validation: Found {len(mappings)} user mappings:")
+        for m in mappings:
+            logger.info(f"  - Discord: {m[0]} | Email: {m[1]} | ST ID: {m[2]} | Board: {m[3]}")
     
     logger.info("Starting FastAPI bridge thread...")
     from api import run_api

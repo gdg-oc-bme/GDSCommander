@@ -61,6 +61,15 @@ def get_discord_id_from_superthread(superthread_user_id):
     conn.close()
     return row[0] if row else None
 
+def list_user_mappings():
+    """Returns all current mappings for validation logs."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT discord_id, superthread_email, superthread_user_id, preferred_board_id FROM user_mapping")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
 if __name__ == "__main__":
     init_db()
     print("Database initialized.")
