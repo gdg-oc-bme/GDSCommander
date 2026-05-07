@@ -25,4 +25,6 @@ async def help(interaction: Interaction):
     response.add_field(name='`/website`', value='Gives you the link to our website', inline=False)
     response.add_field(name='`/linktree`', value='Gives you the link to our linktree', inline=False)
     response.add_field(name='`/techtrivia`', value='Asks you a random tech-related trivia question and gives you four possible answers.', inline=False)
+    response.add_field(name='`/st_setup`', value='Start the Superthread configuration wizard', inline=False)
+    response.add_field(name='`/st_create`', value='Create a new card in Superthread interactively', inline=False)
     await interaction.response.send_message(embed=response)
