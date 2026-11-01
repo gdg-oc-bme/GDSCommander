@@ -17,8 +17,10 @@ RUN uv sync --locked
 # Runtime: no .env loaded; pass TOKEN (and optional logos) via env
 ENV ENV=PROD
 ENV PYTHONUNBUFFERED=1
+# Database lives in /app/data so it can be mounted as a volume (see compose.yaml)
+ENV DB_PATH=/app/data/gdscommander.db
 
-RUN adduser --disabled-password --gecos "" app && chown -R app:app /app
+RUN adduser --disabled-password --gecos "" app && mkdir -p /app/data && chown -R app:app /app
 USER app
 
 CMD ["uv", "run", "python", "setup.py"]

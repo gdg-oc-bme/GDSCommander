@@ -1,7 +1,8 @@
 import sqlite3
 import os
 
-DB_PATH = "gdscommander.db"
+# Docker sets DB_PATH to a mounted volume so the data survives redeploys
+DB_PATH = os.getenv("DB_PATH", "gdscommander.db")
 
 def init_db():
     conn = sqlite3.connect(DB_PATH)
