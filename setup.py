@@ -41,10 +41,17 @@ def main():
         for m in mappings:
             logger.info(f"  - Discord: {m[0]} | Email: {m[1]} | ST ID: {m[2]} | Board: {m[3]}")
     
-    logger.info("Starting FastAPI bridge thread...")
-    from api import run_api
-    api_thread = threading.Thread(target=run_api, args=(bot,), daemon=True)
-    api_thread.start()
+    # api.py was never committed; start the bridge only if the file is present
+    try:
+        from api import run_api
+    except ModuleNotFoundError as e:
+        if e.name != "api":
+            raise
+        logger.warning("api.py not found, skipping FastAPI bridge.")
+    else:
+        logger.info("Starting FastAPI bridge thread...")
+        api_thread = threading.Thread(target=run_api, args=(bot,), daemon=True)
+        api_thread.start()
 
     TOKEN=getenv("TOKEN")
     logger.info("Connecting to Discord...")

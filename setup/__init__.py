@@ -23,7 +23,5 @@ async def on_ready():
             print(f"--- Synced {len(synced)} commands to Guild: {guild.name} ({guild.id}) ---")
         except Exception as e:
             print(f"Failed to sync to {guild.name}: {e}")
-    
-    # Also sync global (just in case)
-    await bot.tree.sync()
-    print("Global sync complete.")
+    # No global sync on top of this: Discord would list every command twice
+    # (once global, once per server). New servers get commands on next restart.
