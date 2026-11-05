@@ -9,7 +9,7 @@ from discord.ui import View, Modal, TextInput, Button
 from setup import bot
 from database import save_meeting
 from config import (
-    MEETING_ORGANIZER_ROLES, MEETING_TESTERS, MEETING_AUDIENCE_ROLES, MEETING_EVERYONE_ROLE, MEETING_CATEGORY_ID,
+    MEETING_ORGANIZER_ROLES, MEETING_TESTERS, MEETING_TEST_CHANNELS, MEETING_AUDIENCE_ROLES, MEETING_EVERYONE_ROLE, MEETING_CATEGORY_ID,
     MEETING_TIMEZONE, MEETING_FIRST_SLOT, MEETING_LAST_SLOT, MEETING_DEFAULT_DURATION,
 )
 
@@ -344,8 +344,8 @@ async def meeting(interaction: Interaction):
         await interaction.response.send_message("You do not have permission to use this command.", ephemeral=True)
         return
 
-    # and only in the core channels (threads count too)
-    if interaction.channel.category_id != MEETING_CATEGORY_ID:
+    # and only in the core channels (threads count too) or a test channel
+    if interaction.channel_id not in MEETING_TEST_CHANNELS and interaction.channel.category_id != MEETING_CATEGORY_ID:
         await interaction.response.send_message("You can only use /meeting in the core channels.", ephemeral=True)
         return
 
