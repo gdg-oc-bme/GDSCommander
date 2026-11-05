@@ -24,6 +24,7 @@ BOARD_COLUMNS = {
 
 # /meeting (names are matched ignoring caps)
 MEETING_ORGANIZER_ROLES = ["Admin", "Club Lead", "Tech Team Head", "Solutions Team Head", "Social Media Team Head", "Event Team Head"]
+MEETING_TESTERS = [335783692175802368]  # user ids that skip the role check, temporary, remove before merging
 MEETING_AUDIENCE_ROLES = ["Core Member", "Tech Team", "Solutions Team", "Social Media Team", "Event Team"]
 MEETING_EVERYONE_ROLE = "Core Member"  # already covers everyone, so it can't be mixed with the others
 # core channels category, right click the category > copy id
