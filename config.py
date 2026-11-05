@@ -26,8 +26,8 @@ BOARD_COLUMNS = {
 MEETING_ORGANIZER_ROLES = ["Admin", "Club Lead", "Tech Team Head", "Solutions Team Head", "Social Media Team Head", "Event Team Head"]
 MEETING_TESTERS = [335783692175802368]  # user ids that skip the role check, temporary, remove before merging
 MEETING_TEST_CHANNELS = [1153008384925253682]  # channels that skip the category check (bot testing), also temporary
-MEETING_AUDIENCE_ROLES = ["Core Member", "Tech Team", "Solutions Team", "Social Media Team", "Event Team"]
-MEETING_EVERYONE_ROLE = "Core Member"  # already covers everyone, so it can't be mixed with the others
+MEETING_AUDIENCE_ROLES = ["Core Team", "Tech Team", "Solutions Team", "Social Media Team", "Event Team"]
+MEETING_EVERYONE_ROLE = "Core Team"  # already covers everyone, so it can't be mixed with the others
 # core channels category, right click the category > copy id
 MEETING_CATEGORY_ID = 881622737444040754 # category ID for category containing core channels (----🔑Team🔑----)
 MEETING_TIMEZONE = "Europe/Budapest"

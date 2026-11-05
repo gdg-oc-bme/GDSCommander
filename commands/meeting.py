@@ -206,7 +206,7 @@ class MeetingPanel(View):
     @discord.ui.select(placeholder="Who is this meeting for?", min_values=1, row=0)
     async def audience_select(self, interaction: Interaction, select: discord.ui.Select):
         picked = [role for role in self.audience if str(role.id) in select.values]
-        # core member already means everyone, so it wins over the rest
+        # core team already means everyone, so it wins over the rest
         if self.everyone in picked and len(picked) > 1:
             picked = [self.everyone]
             self.note = f"{self.everyone.name} already covers everyone, so I dropped the others."
