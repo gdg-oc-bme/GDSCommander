@@ -23,6 +23,25 @@ def init_db():
             value TEXT
         )
     ''')
+    # meetings made with /meeting, times are utc
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS meetings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            guild_id TEXT,
+            channel_id TEXT,
+            message_id TEXT,
+            organizer_id TEXT,
+            role_ids TEXT,
+            starts_at TEXT,
+            duration_minutes INTEGER,
+            title TEXT,
+            description TEXT,
+            room TEXT,
+            link TEXT,
+            status TEXT DEFAULT 'scheduled',
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -61,6 +80,17 @@ def get_discord_id_from_superthread(superthread_user_id):
     row = cursor.fetchone()
     conn.close()
     return row[0] if row else None
+
+def save_meeting(guild_id, channel_id, message_id, organizer_id, role_ids, starts_at, duration_minutes, title, description, room, link):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO meetings (guild_id, channel_id, message_id, organizer_id, role_ids, starts_at, duration_minutes, title, description, room, link)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (str(guild_id), str(channel_id), str(message_id), str(organizer_id), ",".join(map(str, role_ids)),
+          starts_at, duration_minutes, title, description, room, link))
+    conn.commit()
+    conn.close()
 
 def list_user_mappings():
     """Returns all current mappings for validation logs."""

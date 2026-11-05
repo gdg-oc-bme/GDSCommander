@@ -22,6 +22,17 @@ BOARD_COLUMNS = {
     "7": ["31", "32", "33", "34", "35"]  # Event
 }
 
+# /meeting (names are matched ignoring caps)
+MEETING_ORGANIZER_ROLES = ["Admin", "Club Lead", "Tech Team Head", "Solutions Team Head", "Social Media Team Head", "Event Team Head"]
+MEETING_AUDIENCE_ROLES = ["Core Member", "Tech Team", "Solutions Team", "Social Media Team", "Event Team"]
+MEETING_EVERYONE_ROLE = "Core Member"  # already covers everyone, so it can't be mixed with the others
+# core channels category, right click the category > copy id
+MEETING_CATEGORY_ID = 881622737444040754 # category ID for category containing core channels (----🔑Team🔑----)
+MEETING_TIMEZONE = "Europe/Budapest"
+MEETING_FIRST_SLOT = "09:00"
+MEETING_LAST_SLOT = "20:30"
+MEETING_DEFAULT_DURATION = 60  # minutes, has to be one of the DURATIONS in commands/meeting.py
+
 def get_column_id(board_id, column_name):
     """Helper to find the specific API ID for a column name on a board."""
     if board_id not in BOARD_COLUMNS:
