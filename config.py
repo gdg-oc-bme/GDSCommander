@@ -38,6 +38,10 @@ MEETING_REMINDER_CHANNEL_ID = 881621203587047472  # #meeting-plans
 MEETING_REMINDER_HOURS = [12, 1]  # hours before the meeting, if 12 is too soon it tries 1
 MEETING_REMINDER_MIN_GAP = 1  # hours, a reminder right after the announcement is pointless
 
+# weekly activity log reminder, sundays at noon budapest time
+LOG_REMINDER_CHANNEL_ID = 881622839537569813
+LOG_REMINDER_ROLE = "Tech Team"
+
 def get_column_id(board_id, column_name):
     """Helper to find the specific API ID for a column name on a board."""
     if board_id not in BOARD_COLUMNS:

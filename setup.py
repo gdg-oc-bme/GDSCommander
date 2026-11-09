@@ -26,7 +26,7 @@ def main():
     
     # We import Events
     import events
-    from events import welcomemessage, nameChange
+    from events import welcomemessage, nameChange, logReminder
     
     logger.info("Initializing Database...")
     from database import init_db, list_user_mappings
