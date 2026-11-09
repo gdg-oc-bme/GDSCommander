@@ -53,9 +53,11 @@ def day_label(day, today):
     return {0: f"Today · {label}", 1: f"Tomorrow · {label}"}.get((day - today).days, label)
 
 
-def default_title(roles):
+def default_title(roles, people):
     # "Tech Team meeting", "Tech Team and Event Team meeting", "A, B and C meeting"
+    # more than 3 people just becomes "5 people", titles have a length limit
     names = [role.name for role in roles]
+    names += [person.display_name for person in people] if len(people) <= 3 else [f"{len(people)} people"]
     if not names:
         return "New meeting"
     joined = names[0] if len(names) == 1 else f"{', '.join(names[:-1])} and {names[-1]}"
@@ -87,6 +89,7 @@ class MeetingPanel(View):
         self.today = datetime.now(TZ).date()
         # what the organizer fills in, empty till they pick something
         self.roles = []
+        self.people = []
         self.day = None
         self.start = None
         self.duration = MEETING_DEFAULT_DURATION
@@ -105,7 +108,7 @@ class MeetingPanel(View):
     def missing(self):
         # anything in here keeps create! greyed out
         missing = []
-        if not self.roles:
+        if not (self.roles or self.people):
             missing.append("who it's for")
         if not self.day:
             missing.append("a date")
@@ -133,9 +136,13 @@ class MeetingPanel(View):
             lines.append(f"⚠️ {', '.join(quiet)} won't actually get pinged, turn on \"Allow anyone to @mention this role\" in the role settings.")
         return "\n".join(lines)
 
+    def mentions(self):
+        # teams first, then people
+        return " ".join(item.mention for item in [*self.roles, *self.people])
+
     def embed(self):
         # same embed for the preview and the real post, so what you see is what you get :)
-        embed = Embed(title=self.title or default_title(self.roles), description=self.description or None, color=discord.Color.blue())
+        embed = Embed(title=self.title or default_title(self.roles, self.people), description=self.description or None, color=discord.Color.blue())
         when = "Not set yet"
         if self.day and self.start:
             start = self.starts_at()
@@ -144,7 +151,7 @@ class MeetingPanel(View):
         embed.add_field(name="🗓 When", value=when, inline=False)
         embed.add_field(name="⏱ Duration", value=DURATIONS[self.duration])
         embed.add_field(name="📍 Where", value="\n".join(filter(None, [self.room, self.link])) or "Not set yet")
-        embed.add_field(name="👥 For", value=" ".join(role.mention for role in self.roles) or "Not set yet", inline=False)
+        embed.add_field(name="👥 For", value=self.mentions() or "Not set yet", inline=False)
         embed.add_field(name="Organized by", value=self.organizer.mention, inline=False)
         return embed
 
@@ -203,7 +210,8 @@ class MeetingPanel(View):
         self.note = None  # notes only show once
         await interaction.response.edit_message(content=content, embed=self.embed(), view=self)
 
-    @discord.ui.select(placeholder="Who is this meeting for?", min_values=1, row=0)
+    # min 0 so you can clear the teams and only invite people
+    @discord.ui.select(placeholder="Which teams is it for?", min_values=0, row=0)
     async def audience_select(self, interaction: Interaction, select: discord.ui.Select):
         picked = [role for role in self.audience if str(role.id) in select.values]
         # core team already means everyone, so it wins over the rest
@@ -239,6 +247,13 @@ class MeetingPanel(View):
     async def details_button(self, interaction: Interaction, button: discord.ui.Button):
         await interaction.response.send_modal(DetailsModal(self))
 
+    @discord.ui.button(label="People", emoji="👥", style=discord.ButtonStyle.secondary, row=4)
+    async def people_button(self, interaction: Interaction, button: discord.ui.Button):
+        # no room for a 6th row, so the people picker takes over the panel for a sec
+        self.last_interaction = interaction
+        picker = PeoplePicker(self)
+        await interaction.response.edit_message(content=picker.status(), embed=self.embed(), view=picker)
+
     @discord.ui.button(label="Create!", style=discord.ButtonStyle.success, row=4)
     async def create_button(self, interaction: Interaction, button: discord.ui.Button):
         # double clicks are real lol
@@ -257,10 +272,10 @@ class MeetingPanel(View):
         # pings have to go in the text, mentions inside an embed don't notify anyone
         try:
             message = await self.channel.send(
-                " ".join(role.mention for role in self.roles),
+                self.mentions(),
                 embed=embed,
                 view=self.links(embed.title, start, end),
-                allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=self.roles),
+                allowed_mentions=discord.AllowedMentions(everyone=False, users=self.people, roles=self.roles),
             )
         except discord.HTTPException:
             logger.exception("Couldn't post a meeting")
@@ -272,7 +287,8 @@ class MeetingPanel(View):
         await interaction.response.edit_message(content=f"Posted ✅ {message.jump_url}", embed=None, view=None)
         # saved after replying, so a db hiccup can't make a posted meeting look failed
         save_meeting(
-            interaction.guild_id, self.channel.id, message.id, self.organizer.id, [role.id for role in self.roles],
+            interaction.guild_id, self.channel.id, message.id, self.organizer.id,
+            [role.id for role in self.roles], [person.id for person in self.people],
             start.astimezone(timezone.utc).isoformat(), self.duration, embed.title, self.description, self.room, self.link,
         )
         logger.info(f"Meeting '{embed.title}' posted by {self.organizer}")
@@ -288,6 +304,35 @@ class MeetingPanel(View):
             await self.last_interaction.edit_original_response(content=EXPIRED, embed=None, view=None)
         except discord.HTTPException:
             pass  # they already dismissed it, nothing to tidy up
+
+
+class PeoplePicker(View):
+    # discord.py 2.2 can't pre-select people, so picking always replaces the list
+    def __init__(self, panel):
+        super().__init__(timeout=panel.timeout)
+        self.panel = panel
+
+    def status(self):
+        picked = " ".join(person.mention for person in self.panel.people) or "nobody yet"
+        return f"**Pick people** · whoever you pick replaces the current list\nPicked so far: {picked}"
+
+    async def back_to_panel(self, interaction):
+        self.stop()
+        await self.panel.update(interaction)
+
+    @discord.ui.select(cls=discord.ui.UserSelect, placeholder="Pick people", max_values=25)
+    async def people_select(self, interaction: Interaction, select: discord.ui.UserSelect):
+        self.panel.people = select.values
+        await self.back_to_panel(interaction)
+
+    @discord.ui.button(label="Clear people", style=discord.ButtonStyle.danger)
+    async def clear_button(self, interaction: Interaction, button: discord.ui.Button):
+        self.panel.people = []
+        await self.back_to_panel(interaction)
+
+    @discord.ui.button(label="Back", style=discord.ButtonStyle.secondary)
+    async def back_button(self, interaction: Interaction, button: discord.ui.Button):
+        await self.back_to_panel(interaction)
 
 
 # the pop-up for title, description, room and link
