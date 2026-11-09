@@ -9,7 +9,7 @@ from discord.ui import View, Modal, TextInput, Button
 from setup import bot
 from database import save_meeting
 from config import (
-    MEETING_ORGANIZER_ROLES, MEETING_AUDIENCE_ROLES, MEETING_EVERYONE_ROLE, MEETING_CATEGORY_ID,
+    MEETING_AUDIENCE_ROLES, MEETING_EVERYONE_ROLE, MEETING_CATEGORY_IDS,
     MEETING_TIMEZONE, MEETING_FIRST_SLOT, MEETING_LAST_SLOT, MEETING_DEFAULT_DURATION,
 )
 
@@ -339,13 +339,8 @@ class TypedModal(Modal):
 @app_commands.guild_only()
 async def meeting(interaction: Interaction):
     logger.info(f"Received /meeting from {interaction.user}")
-    # heads and admins only
-    if not any(find_named(interaction.user.roles, name) for name in MEETING_ORGANIZER_ROLES):
-        await interaction.response.send_message("You do not have permission to use this command.", ephemeral=True)
-        return
-
-    # and only in the core channels (threads count too)
-    if interaction.channel.category_id != MEETING_CATEGORY_ID:
+    # anyone who can get into these categories can make meetings, threads count too
+    if interaction.channel.category_id not in MEETING_CATEGORY_IDS:
         await interaction.response.send_message("You can only use /meeting in the core channels.", ephemeral=True)
         return
 

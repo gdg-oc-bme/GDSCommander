@@ -23,11 +23,13 @@ BOARD_COLUMNS = {
 }
 
 # /meeting (names are matched ignoring caps)
-MEETING_ORGANIZER_ROLES = ["Admin", "Club Lead", "Tech Team Head", "Solutions Team Head", "Social Media Team Head", "Event Team Head"]
 MEETING_AUDIENCE_ROLES = ["Core Team", "Tech Team", "Solutions Team", "Social Media Team", "Event Team"]
 MEETING_EVERYONE_ROLE = "Core Team"  # already covers everyone, so it can't be mixed with the others
-# core channels category, right click the category > copy id
-MEETING_CATEGORY_ID = 881622737444040754 # category ID for category containing core channels (----🔑Team🔑----)
+# categories /meeting works in, right click a category > copy id
+MEETING_CATEGORY_IDS = [
+    881622737444040754,   # core channels (----🔑Team🔑----)
+    1081183179400032307,  # bot testing
+]
 MEETING_TIMEZONE = "Europe/Budapest"
 MEETING_FIRST_SLOT = "09:00"
 MEETING_LAST_SLOT = "20:30"
