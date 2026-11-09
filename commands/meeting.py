@@ -5,12 +5,14 @@ from zoneinfo import ZoneInfo
 
 import discord
 from discord import app_commands, Interaction, Embed, SelectOption
+from discord.ext import tasks
 from discord.ui import View, Modal, TextInput, Button
 from setup import bot
-from database import save_meeting
+from database import save_meeting, due_reminders, mark_reminded
 from config import (
     MEETING_AUDIENCE_ROLES, MEETING_EVERYONE_ROLE, MEETING_CATEGORY_IDS,
     MEETING_TIMEZONE, MEETING_FIRST_SLOT, MEETING_LAST_SLOT, MEETING_DEFAULT_DURATION,
+    MEETING_REMINDER_CHANNEL_ID, MEETING_REMINDER_HOURS, MEETING_REMINDER_MIN_GAP,
 )
 
 logger = logging.getLogger("GDSCommander.meeting")
@@ -68,6 +70,17 @@ def is_https(link):
     # good enough for discord to accept it as a button link
     parsed = urlparse(link)
     return parsed.scheme == "https" and bool(parsed.netloc) and " " not in link
+
+
+def utc(moment):
+    # one fixed format in the db, so times can be compared as plain text
+    return moment.astimezone(timezone.utc).isoformat(timespec="seconds")
+
+
+def reminder_hours(start, now):
+    # 12h before if there's time, else 1h before, else none (the announcement is the heads up)
+    gap = timedelta(hours=MEETING_REMINDER_MIN_GAP)
+    return next((hours for hours in MEETING_REMINDER_HOURS if start - timedelta(hours=hours) - now >= gap), None)
 
 
 def calendar_url(base, params, details_key, details):
@@ -129,6 +142,13 @@ class MeetingPanel(View):
             lines.append(f"ℹ️ {self.note}")
         missing = self.missing()
         lines.append("Still needed: " + ", ".join(missing) if missing else "Looks good! Hit **Create!** to post it.")
+        now = datetime.now(TZ)
+        if self.day and self.start and self.starts_at() > now:
+            hours = reminder_hours(self.starts_at(), now)
+            lines.append(
+                f"⏰ Reminder in <#{MEETING_REMINDER_CHANNEL_ID}> {hours} hour{'s' * (hours != 1)} before" if hours
+                else "⏰ No reminder, it's too soon, the announcement is the heads up"
+            )
         # roles that aren't mentionable only get pinged if the bot has the "mention everyone" perm
         can_ping_all = self.channel.permissions_for(self.channel.guild.me).mention_everyone
         quiet = [role.name for role in self.roles if not (role.mentionable or can_ping_all)]
@@ -285,11 +305,13 @@ class MeetingPanel(View):
 
         self.stop()
         await interaction.response.edit_message(content=f"Posted ✅ {message.jump_url}", embed=None, view=None)
+        hours = reminder_hours(start, datetime.now(TZ))
         # saved after replying, so a db hiccup can't make a posted meeting look failed
         save_meeting(
             interaction.guild_id, self.channel.id, message.id, self.organizer.id,
             [role.id for role in self.roles], [person.id for person in self.people],
-            start.astimezone(timezone.utc).isoformat(), self.duration, embed.title, self.description, self.room, self.link,
+            utc(start), self.duration, embed.title, self.description, self.room, self.link,
+            utc(start - timedelta(hours=hours)) if hours else None,
         )
         logger.info(f"Meeting '{embed.title}' posted by {self.organizer}")
 
@@ -378,6 +400,49 @@ class TypedModal(Modal):
             return
         setattr(self.panel, self.attr, value)  # attr is "day" or "start"
         await self.panel.update(interaction)
+
+
+def split_ids(text):
+    # "1,2,3" from the db back into ints, older rows can be empty
+    return [int(i) for i in (text or "").split(",") if i]
+
+
+async def send_reminder(meeting):
+    roles, users = split_ids(meeting["role_ids"]), split_ids(meeting["user_ids"])
+    start = datetime.fromisoformat(meeting["starts_at"])
+    link = f"https://discord.com/channels/{meeting['guild_id']}/{meeting['channel_id']}/{meeting['message_id']}"
+    mentions = " ".join([f"<@&{i}>" for i in roles] + [f"<@{i}>" for i in users])
+    channel = bot.get_channel(MEETING_REMINDER_CHANNEL_ID)
+    if channel is None:
+        logger.warning("Can't see the reminder channel, check MEETING_REMINDER_CHANNEL_ID")
+    else:
+        try:
+            await channel.send(
+                f"⏰ {mentions}\n**{meeting['title']}** starts {discord.utils.format_dt(start, 'R')} ({discord.utils.format_dt(start, 't')}) · {link}",
+                allowed_mentions=discord.AllowedMentions(everyone=False, roles=[discord.Object(i) for i in roles], users=[discord.Object(i) for i in users]),
+            )
+        except discord.HTTPException:
+            logger.exception(f"Couldn't send the reminder for meeting {meeting['id']}")
+    # only ever tries once, so a missing channel or permission doesn't spam the logs every minute
+    mark_reminded(meeting["id"])
+
+
+@tasks.loop(minutes=1)
+async def send_reminders():
+    # checks the db every minute, so reminders survive bot restarts
+    try:
+        for meeting in due_reminders(utc(datetime.now(timezone.utc))):
+            await send_reminder(meeting)
+    except Exception:
+        # one bad round shouldn't kill reminders for good
+        logger.exception("Reminder loop failed")
+
+
+@bot.listen("on_ready")
+async def start_reminders():
+    # on_ready fires again after reconnects, so only start once
+    if not send_reminders.is_running():
+        send_reminders.start()
 
 
 @bot.tree.command(name="meeting", description="Set up a meeting and ping the people in it")

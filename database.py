@@ -40,12 +40,14 @@ def init_db():
             room TEXT,
             link TEXT,
             status TEXT DEFAULT 'scheduled',
+            remind_at TEXT,
+            reminded INTEGER DEFAULT 0,
             created_at TEXT DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     # dbs made before a column existed get it added here
     columns = {row[1] for row in cursor.execute("PRAGMA table_info(meetings)")}
-    for column, kind in [("user_ids", "TEXT")]:
+    for column, kind in [("user_ids", "TEXT"), ("remind_at", "TEXT"), ("reminded", "INTEGER DEFAULT 0")]:
         if column not in columns:
             cursor.execute(f"ALTER TABLE meetings ADD COLUMN {column} {kind}")
     conn.commit()
@@ -87,14 +89,34 @@ def get_discord_id_from_superthread(superthread_user_id):
     conn.close()
     return row[0] if row else None
 
-def save_meeting(guild_id, channel_id, message_id, organizer_id, role_ids, user_ids, starts_at, duration_minutes, title, description, room, link):
+def save_meeting(guild_id, channel_id, message_id, organizer_id, role_ids, user_ids, starts_at, duration_minutes, title, description, room, link, remind_at):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute('''
-        INSERT INTO meetings (guild_id, channel_id, message_id, organizer_id, role_ids, user_ids, starts_at, duration_minutes, title, description, room, link)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO meetings (guild_id, channel_id, message_id, organizer_id, role_ids, user_ids, starts_at, duration_minutes, title, description, room, link, remind_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', (str(guild_id), str(channel_id), str(message_id), str(organizer_id), ",".join(map(str, role_ids)), ",".join(map(str, user_ids)),
-          starts_at, duration_minutes, title, description, room, link))
+          starts_at, duration_minutes, title, description, room, link, remind_at))
+    conn.commit()
+    conn.close()
+
+def due_reminders(now):
+    # reminders whose time came, for meetings that haven't started yet
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT id, guild_id, channel_id, message_id, role_ids, user_ids, starts_at, title FROM meetings
+        WHERE status = 'scheduled' AND reminded = 0 AND remind_at <= ? AND starts_at > ?
+    ''', (now, now))
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return rows
+
+def mark_reminded(meeting_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('UPDATE meetings SET reminded = 1 WHERE id = ?', (meeting_id,))
     conn.commit()
     conn.close()
 

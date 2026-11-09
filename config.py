@@ -34,6 +34,9 @@ MEETING_TIMEZONE = "Europe/Budapest"
 MEETING_FIRST_SLOT = "09:00"
 MEETING_LAST_SLOT = "20:30"
 MEETING_DEFAULT_DURATION = 60  # minutes, has to be one of the DURATIONS in commands/meeting.py
+MEETING_REMINDER_CHANNEL_ID = 881621203587047472  # #meeting-plans
+MEETING_REMINDER_HOURS = [12, 1]  # hours before the meeting, if 12 is too soon it tries 1
+MEETING_REMINDER_MIN_GAP = 1  # hours, a reminder right after the announcement is pointless
 
 def get_column_id(board_id, column_name):
     """Helper to find the specific API ID for a column name on a board."""
