@@ -115,8 +115,8 @@ class MeetingPanel(View):
         self.refresh()
 
     def starts_at(self):
-        # picked date + time, in budapest time
-        return datetime.combine(self.day, self.start, tzinfo=TZ)
+        # picked in budapest time but handed back in utc, so hour maths doesn't go off by one on dst days
+        return datetime.combine(self.day, self.start, tzinfo=TZ).astimezone(timezone.utc)
 
     def missing(self):
         # anything in here keeps create! greyed out
