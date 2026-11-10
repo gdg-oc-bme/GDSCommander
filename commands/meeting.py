@@ -130,7 +130,7 @@ class MeetingPanel(View):
         if self.day and self.start and self.starts_at() <= datetime.now(TZ):
             missing.append("a time that isn't in the past")
         if not (self.room or self.link):
-            missing.append("a room or link (✏️ Details)")
+            missing.append("a place or link (✏️ Details)")
         if self.link and not is_https(self.link):
             missing.append("a link starting with https://")
         return missing
@@ -357,11 +357,11 @@ class PeoplePicker(View):
         await self.back_to_panel(interaction)
 
 
-# the pop-up for title, description, room and link
+# the pop-up for title, description, place and link
 class DetailsModal(Modal, title="Meeting details"):
     meeting_title = TextInput(label="Title", placeholder="Leave empty for e.g. \"Tech Team meeting\"", required=False, max_length=100)
     description = TextInput(label="Description", style=discord.TextStyle.paragraph, required=False, max_length=1000)
-    room = TextInput(label="Room (if in person)", placeholder="e.g. Q building, QBF13", required=False, max_length=100)
+    room = TextInput(label="Place", placeholder="e.g. Q building, QBF13", required=False, max_length=100)
     link = TextInput(label="Link (if online)", placeholder="https://meet.google.com/...", required=False, max_length=200)
 
     def __init__(self, panel):
