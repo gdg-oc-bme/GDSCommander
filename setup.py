@@ -22,11 +22,11 @@ def main():
     
     # We import ALL command modules to trigger their decorators
     logger.info("Importing Commands...")
-    from commands import help, teams, join, about, socials, createRole, techTrivia, event, superthread
+    from commands import help, teams, join, about, socials, createRole, techTrivia, event, superthread, meeting
     
     # We import Events
     import events
-    from events import welcomemessage, nameChange
+    from events import welcomemessage, nameChange, logReminder
     
     logger.info("Initializing Database...")
     from database import init_db, list_user_mappings

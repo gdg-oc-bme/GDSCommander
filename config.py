@@ -22,6 +22,26 @@ BOARD_COLUMNS = {
     "7": ["31", "32", "33", "34", "35"]  # Event
 }
 
+# /meeting (names are matched ignoring caps)
+MEETING_AUDIENCE_ROLES = ["Core Team", "Tech Team", "Solutions Team", "Social Media Team", "Event Team"]
+MEETING_EVERYONE_ROLE = "Core Team"  # already covers everyone, so it can't be mixed with the others
+# categories /meeting works in, right click a category > copy id
+MEETING_CATEGORY_IDS = [
+    881622737444040754,   # core channels (----🔑Team🔑----)
+    1081183179400032307,  # bot testing
+]
+MEETING_TIMEZONE = "Europe/Budapest"
+MEETING_FIRST_SLOT = "09:00"
+MEETING_LAST_SLOT = "20:30"
+MEETING_DEFAULT_DURATION = 60  # minutes, has to be one of the DURATIONS in commands/meeting.py
+MEETING_REMINDER_CHANNEL_ID = 881621203587047472  # #meeting-plans
+MEETING_REMINDER_HOURS = [12, 1]  # hours before the meeting, if 12 is too soon it tries 1
+MEETING_REMINDER_MIN_GAP = 1  # hours, a reminder right after the announcement is pointless
+
+# weekly activity log reminder, sundays at noon budapest time
+LOG_REMINDER_CHANNEL_ID = 881622839537569813
+LOG_REMINDER_ROLE = "Tech Team"
+
 def get_column_id(board_id, column_name):
     """Helper to find the specific API ID for a column name on a board."""
     if board_id not in BOARD_COLUMNS:
