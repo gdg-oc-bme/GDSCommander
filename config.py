@@ -42,6 +42,13 @@ MEETING_REMINDER_MIN_GAP = 1  # hours, a reminder right after the announcement i
 LOG_REMINDER_CHANNEL_ID = 881622839537569813
 LOG_REMINDER_ROLE = "Tech Team"
 
+# /ask, gemini free tier for now
+ASK_MODEL = "gemini-3.5-flash-lite"
+ASK_CATEGORY_IDS = [
+    1081183179400032307,  # bot testing, only here while we try it out
+]
+ASK_COOLDOWN = 30  # seconds between questions per person, the free quota runs out fast lol
+
 def get_column_id(board_id, column_name):
     """Helper to find the specific API ID for a column name on a board."""
     if board_id not in BOARD_COLUMNS:

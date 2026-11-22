@@ -22,7 +22,7 @@ def main():
     
     # We import ALL command modules to trigger their decorators
     logger.info("Importing Commands...")
-    from commands import help, teams, join, about, socials, createRole, techTrivia, event, superthread, meeting
+    from commands import help, teams, join, about, socials, createRole, techTrivia, event, superthread, meeting, ask
     
     # We import Events
     import events

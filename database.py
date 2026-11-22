@@ -50,6 +50,13 @@ def init_db():
     for column, kind in [("user_ids", "TEXT"), ("remind_at", "TEXT"), ("reminded", "INTEGER DEFAULT 0")]:
         if column not in columns:
             cursor.execute(f"ALTER TABLE meetings ADD COLUMN {column} {kind}")
+    # people who've used /ask, so the google notice only shows once
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS ask_users (
+            user_id TEXT PRIMARY KEY,
+            first_asked_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
     conn.commit()
     conn.close()
 
@@ -119,6 +126,16 @@ def mark_reminded(meeting_id):
     cursor.execute('UPDATE meetings SET reminded = 1 WHERE id = ?', (meeting_id,))
     conn.commit()
     conn.close()
+
+def first_ask(user_id):
+    # true only the very first time someone uses /ask
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('INSERT OR IGNORE INTO ask_users (user_id) VALUES (?)', (str(user_id),))
+    first = cursor.rowcount == 1
+    conn.commit()
+    conn.close()
+    return first
 
 def list_user_mappings():
     """Returns all current mappings for validation logs."""
